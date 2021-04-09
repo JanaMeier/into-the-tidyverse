@@ -23,7 +23,8 @@ custom_mean(this_vector = my_vector)
 library("readr")
 library("dplyr")
 library("here")
-covid <- here("Data", "time_series_covid19_confirmed_US.csv") %>%  #search for file in Data folder, read it in as tibble and show first 10 rows
+covid <- here("Data", "time_s
+              ries_covid19_confirmed_US.csv") %>%  #search for file in Data folder, read it in as tibble and show first 10 rows
   read_csv()
 covid %>% 
   slice(1:10) #slice lets us look at only some rows
@@ -148,7 +149,7 @@ elections <- here("Data", "countypres_2000-2016.csv") %>% #search for election d
   mutate(lean_republican = candidatevotes/first(candidatevotes)) %>% 
   ungroup() %>% 
   filter(party=="republican") %>% #now keep only the rows with republican votes since they contain the ratio in column "lean_republican"
-  select(state, county, FIPS, lean_republican) # keep only relevant columns
+  select(state, county, lean_republican) # keep only relevant columns
 
 # now let's join the parties!
 covid %>% select(FIPS, county=Admin2, state=Province_State, latest_cases=`9/24/20`) %>% #start with covid dataset
@@ -165,69 +166,6 @@ covid %>% select(FIPS, county=Admin2, state=Province_State, latest_cases=`9/24/2
 # inner_join: keeps only rows that have values in both dataframes
 # full_join: keeps all rows
 
-## 8. Exercises -------------------------------------------------------------------------------------------------------------
 
-# load dataset with incarceration trends
-incarcerations <- here("Data", "incarceration_trends.csv") %>%
-  read_csv()
-# keep only data for California and only some relevant columns, compute proportion of incarcerated people in total population
-unique(incarcerations$state)
-ca_jail <- incarcerations %>% filter(state=="CA" & year=="2018") %>% 
-  select(fips, total_pop, total_jail_pop) %>% 
-  mutate(prop_jail = total_jail_pop/total_pop)
-# does a county's political leaning affect its tendency to jail people?
-ca_jail <- ca_jail %>% 
-  left_join(elections, by= c("fips"="FIPS")) %>% 
-  arrange(lean_republican)
-
-# first try: qualitative comparision of 10 least and 10 most republican counties 
-overview <- ca_jail %>% slice_head(n=10) %>% 
-  bind_rows(slice_tail(ca_jail, n=10))
-
-# second try: (had to look this up, stupid me)
-ca_jail_polit <- ca_jail %>% 
-  mutate(more_trump=lean_republican >= 1) %>% 
-  group_by(more_trump) %>% 
-  summarize(mean_prop_jail = mean(prop_jail, na.rm=T), sd_prop_jail=sd(prop_jail, na.rm=T))
-
-# now do this for the whole USA
-jail_polit <- incarcerations %>%
-  filter(year=="2018") %>%
-  select(fips, total_pop, total_jail_pop) %>%
-  mutate(prop_jail=total_jail_pop/total_pop) %>% 
-  left_join(elections, by=c("fips"="FIPS")) %>% 
-  arrange(lean_republican) %>%
-  mutate(more_trump = lean_republican >= 1) %>% 
-  group_by(more_trump) %>% 
-  summarize(mean_prop_jail = mean(prop_jail, na.rm=T), sd_prop_jail = sd(prop_jail, na.rm=T))
-
-jail_polit[is.na(jail_polit$more_trump)==T,]
-# aggregate at the state level
-jail_polit_states <- incarcerations %>%
-  filter(year=="2018") %>%
-  select(fips, total_pop, total_jail_pop) %>%
-  mutate(prop_jail=total_jail_pop/total_pop) %>% 
-  left_join(elections, by=c("fips"="FIPS")) %>%
-  arrange(lean_republican) %>%
-  mutate(more_trump = lean_republican >= 1) %>% 
-  group_by(state, more_trump) %>% 
-  summarize(mean_prop_jail = mean(prop_jail, na.rm=T), sd_prop_jail = sd(prop_jail, na.rm=T))
-
-# --> Louisianna has very high rates
-elections %>% 
-  filter(state=="Louisiana") %>% 
-  group_by (state) %>% 
-  summarize(lean_republican = mean(lean_republican))
-
-# now do this for the whole USA
-jail_polit <- incarcerations %>%
-  filter(year=="2018" & state != "LA") %>%
-  select(fips, total_pop, total_jail_pop) %>%
-  mutate(prop_jail=total_jail_pop/total_pop) %>% 
-  left_join(elections, by=c("fips"="FIPS")) %>% 
-  arrange(lean_republican) %>%
-  mutate(more_trump = lean_republican >= 1) %>% 
-  group_by(more_trump) %>% 
-  summarize(mean_prop_jail = mean(prop_jail, na.rm=T), sd_prop_jail = sd(prop_jail, na.rm=T))
 
 
