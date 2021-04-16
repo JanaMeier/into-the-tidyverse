@@ -1,5 +1,4 @@
 
-
 # Into the Tidyverse Tutorial by Jae-Young Son
 # Exercise 4: Plotting Data I (ggplot2)
 
