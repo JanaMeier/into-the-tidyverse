@@ -1,4 +1,5 @@
 
+
 # Into the Tidyverse Tutorial by Jae-Young Son
 # Exercise 4: Plotting Data I (ggplot2)
 
@@ -312,7 +313,7 @@ covid %>%
   mutate(case_rate = cases/pop*1000) %>%
   group_by(state) %>% 
   summarize(case_rate = sum(case_rate)) %>% 
-  mutate(No = 1) %>% # suuuper umständliche Art, jeder Zeile eine Zeilennummer zuzuordnen, damit die x-Achse übersichtlicher wird
+  mutate(No = 1) %>% # suuuper umstÃ¤ndliche Art, jeder Zeile eine Zeilennummer zuzuordnen, damit die x-Achse Ã¼bersichtlicher wird
   mutate(No = cumsum(No)) %>% 
   ggplot(mapping = aes(x=No, y=case_rate, fill=state)) +
   geom_col() +
@@ -342,7 +343,7 @@ covid_2 <- here("Data", "time_series_covid19_confirmed_US.csv") %>%
 
 covid_2 %>% 
   group_by(state, county, fips) %>% 
-  summarize(cases = max(cases)) %>% # Achtung: wenn man die Summe aller Covid-Cases über die Daten nimmt, bekommt man mehr, als die Bevölkerung von Californien ist --> die cases sind wahrscheinlich schon aufsummert! (ist dann auch in ihren Beispielen teilweise falsch)
+  summarize(cases = max(cases)) %>% # Achtung: wenn man die Summe aller Covid-Cases Ã¼ber die Daten nimmt, bekommt man mehr, als die BevÃ¶lkerung von Californien ist --> die cases sind wahrscheinlich schon aufsummert! (ist dann auch in ihren Beispielen teilweise falsch)
   ungroup() %>% 
   inner_join(incarceration, by = "fips") %>% 
   group_by(state) %>% 
@@ -358,3 +359,4 @@ covid_2 %>%
               se = FALSE,
               size = 0.5)+
   theme(legend.position = "bottom")
+

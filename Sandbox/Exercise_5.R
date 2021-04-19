@@ -39,7 +39,7 @@ regions <- here("Data", "state_region_division.csv") %>%
   read_csv()
 
 ## 1. Axis labels -----------------------------------------------
-
+# by default, ggplot uses variable names as axis labels. We can also manually change them:
 covid %>% 
   ggplot(mapping = aes(x=date, y=cases)) +
   xlab("Time") +
