@@ -330,7 +330,7 @@ covid_regions %>%
 
 ## 6. Miscellany ----------------------------------------------
 
-### 6.1 Position adjustments
+### 6.1 Position adjustments ----------------------------------
 
 # Barplot with side by side bars, not a stacked bar:
 covid %>%
@@ -357,7 +357,7 @@ overlap %>%
   geom_point(position = position_jitter(width = 0.01, height = 0)) +
   coord_cartesian(xlim = c(0.95, 1.05))
 
-### 6.2. Lists + style consistency
+### 6.2. Lists + style consistency ------------------------------
 
 # When a ggplot object is assigned to a variable, it is stored in memory as a list:
 
@@ -386,3 +386,37 @@ covid_regions %>%
   geom_line() +
   facet_grid(cols = vars(region)) +
   theme_jana
+# or:
+my_plot +
+  theme_jana
+
+### 6.3. Saving plots -----------------------------------------
+
+# we might want to save plots. We can use ggsave, this will save the last visualization made by ggplot, if not otherwise specified
+# It's recommendet to save plots as vectorized images, to avoid information loss or problems with resizing the image
+# Vektorizing images can be harder to work with. Vectorized PDF is the happy medium (but I really don't know how to get this into a document).
+
+ggsave(
+  filename = here("Output", "ggsave_example.pdf"), #output dir and file name
+  plot = my_plot + theme_jana, #input
+  width = 8,
+  height = 4,
+  units = "in",
+  dpi = 300, #300 dots per inch is ususally the minimum requirement of publishers
+  useDingbats = FALSE #dingbats are fonts with icons instead of characters. They might make it hard to after edit your image
+)
+
+## 7. Exercises -----------------------------------------------
+
+# load data
+candy <- here("Data", "candyhierarchy2017.csv") %>% 
+  read_csv
+
+# tidy up data
+candy %>% 
+  clean_names() %>% 
+  pivot_longer(cols = starts_with("Q6"), names_to("candy"), values_to("rating"))
+
+
+
+
