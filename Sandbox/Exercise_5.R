@@ -413,9 +413,76 @@ candy <- here("Data", "candyhierarchy2017.csv") %>%
   read_csv
 
 # tidy up data
-candy %>% 
+candy <- candy %>% 
   clean_names() %>% 
-  pivot_longer(cols = starts_with("Q6"), names_to("candy"), values_to("rating"))
+  pivot_longer(cols = starts_with("q6"), names_to ="candy", values_to ="rating") %>% 
+  mutate(rating = factor(rating, levels = c("DESPAIR", "MEH", "JOY")), rating_vals = recode(rating, "DESPAIR" = 1, "MEH" = 2, "JOY" = 3))
+# God this took forever
+  
+levels(candy$rating)
+
+candy %>% 
+  filter(candy %in% c("q6_reeses_pieces", "q6_skittles", "q6_snickers")) %>% 
+  ggplot(aes(x=candy, y= rating_vals, fill=candy)) +
+  geom_bar(stat="summary", fun="mean") +
+  facet_wrap(~q1_going_out)
+
+candy %>% 
+  filter(candy %in% c("q6_reeses_pieces", "q6_skittles", "q6_snickers")) %>% 
+  ggplot(aes(x = candy, fill=rating)) +
+  geom_bar() +
+  facet_wrap(~q10_dress)
+
+# Wow I hate this dataset. Moving on
+
+# get data
+babies <- here("Data", "Popular_Baby_Names.csv") %>% 
+  read_csv() %>% 
+  clean_names() %>% 
+  mutate(name = tolower(childs_first_name))
+
+# some names plottet over time
+
+# line plot
+babies %>% 
+  filter(grepl("^y", name)) %>% 
+  #filter(name %in% c("geraldine", "rihanna","leon", "zoe")) %>% 
+  ggplot(aes(x=year_of_birth, y=count, color=name)) +
+  geom_line(stat="summary")
+
+#bar plot
+babies %>% 
+  filter(grepl("^x", name)) %>% 
+  #filter(name %in% c("geraldine", "rihanna","leon", "zoe")) %>% 
+  ggplot(aes(x=year_of_birth, y=rank, fill=name)) +
+  geom_bar(stat="identity", position = position_dodge()) 
+  
+# popular names in a given year:
+
+#not helpful, but pretty ;D
+babies %>% 
+  filter(year_of_birth == "2014" & rank <= 10) %>% 
+  ggplot(aes(x=ethnicity, y=rank, fill = name)) +
+  geom_bar(stat="identity") +
+  theme(legend.position = "bottom")
+
+# maybe more helpful (not really)
+babies %>% 
+  filter(year_of_birth == "2014" & rank <= 3) %>% 
+  ggplot(aes(x=name, y=rank, fill = name)) +
+  geom_col() +
+  facet_wrap(~ethnicity) +
+  theme(legend.position = "bottom")
+
+
+
+
+
+
+
+
+
+
 
 
 
